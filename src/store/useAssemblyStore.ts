@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { devtools } from "zustand/middleware";
 import type { AssemblyPart, Vector3Tuple, EulerTuple } from "@/types/assembly";
 
 interface TransformUpdate {
@@ -14,39 +15,88 @@ interface AssemblyState {
   removePart: (id: string) => void;
   selectPart: (id: string | null) => void;
   updatePartTransform: (id: string, transform: TransformUpdate) => void;
+  duplicatePart: (id: string) => void;
+  clearParts: () => void;
 }
 
-export const useAssemblyStore = create<AssemblyState>((set) => ({
-  parts: [],
-  selectedPartId: null,
+export const useAssemblyStore = create<AssemblyState>()(
+  devtools(
+    (set) => ({
+      parts: [],
+      selectedPartId: null,
 
-  addPart: (part) =>
-    set((state) => ({
-      parts: [...state.parts, part],
-    })),
+      addPart: (part) =>
+        set(
+          (state) => ({
+            parts: [...state.parts, part],
+          }),
+          false,
+          "addPart",
+        ),
 
-  removePart: (id) =>
-    set((state) => ({
-      parts: state.parts.filter((p) => p.id !== id),
-      selectedPartId: state.selectedPartId === id ? null : state.selectedPartId,
-    })),
+      removePart: (id) =>
+        set(
+          (state) => ({
+            parts: state.parts.filter((p) => p.id !== id),
+            selectedPartId: state.selectedPartId === id ? null : state.selectedPartId,
+          }),
+          false,
+          "removePart",
+        ),
 
-  selectPart: (id) =>
-    set(() => ({
-      selectedPartId: id,
-    })),
+      selectPart: (id) =>
+        set(
+          () => ({
+            selectedPartId: id,
+          }),
+          false,
+          "selectPart",
+        ),
 
-  updatePartTransform: (id, transform) =>
-    set((state) => ({
-      parts: state.parts.map((p) =>
-        p.id === id
-          ? {
-              ...p,
-              ...(transform.position !== undefined && { position: transform.position }),
-              ...(transform.rotation !== undefined && { rotation: transform.rotation }),
-              ...(transform.scale !== undefined && { scale: transform.scale }),
-            }
-          : p,
-      ),
-    })),
-}));
+      updatePartTransform: (id, transform) =>
+        set(
+          (state) => ({
+            parts: state.parts.map((p) =>
+              p.id === id
+                ? {
+                    ...p,
+                    ...(transform.position !== undefined && { position: transform.position }),
+                    ...(transform.rotation !== undefined && { rotation: transform.rotation }),
+                    ...(transform.scale !== undefined && { scale: transform.scale }),
+                  }
+                : p,
+            ),
+          }),
+          false,
+          "updatePartTransform",
+        ),
+
+      duplicatePart: (id) =>
+        set(
+          (state) => {
+            const source = state.parts.find((p) => p.id === id);
+            if (!source) return state;
+            const duplicate: AssemblyPart = {
+              ...source,
+              id: crypto.randomUUID(),
+              name: `${source.name} (copy)`,
+            };
+            return { parts: [...state.parts, duplicate] };
+          },
+          false,
+          "duplicatePart",
+        ),
+
+      clearParts: () =>
+        set(
+          () => ({
+            parts: [],
+            selectedPartId: null,
+          }),
+          false,
+          "clearParts",
+        ),
+    }),
+    { name: "assembly-store" },
+  ),
+);

@@ -17,10 +17,22 @@ export interface MaterialConfig {
   opacity: number;
 }
 
+export type PartType = "wall" | "floor" | "column" | "beam" | "slab" | "stair";
+
+export type GeometryType = "box" | "cylinder";
+
+export interface PartTemplate {
+  type: PartType;
+  name: string;
+  geometryType: GeometryType;
+  defaultScale: Vector3Tuple;
+  defaultMaterial: MaterialConfig;
+}
+
 export interface AssemblyPart {
   id: string;
   name: string;
-  type: string;
+  type: PartType;
   position: Vector3Tuple;
   rotation: EulerTuple;
   scale: Vector3Tuple;

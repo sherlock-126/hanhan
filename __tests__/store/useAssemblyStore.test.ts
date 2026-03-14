@@ -6,7 +6,7 @@ function createTestPart(overrides: Partial<AssemblyPart> = {}): AssemblyPart {
   return {
     id: "part-1",
     name: "Test Part",
-    type: "block",
+    type: "wall",
     position: { x: 0, y: 0, z: 0 },
     rotation: { x: 0, y: 0, z: 0 },
     scale: { x: 1, y: 1, z: 1 },
@@ -134,5 +134,50 @@ describe("useAssemblyStore", () => {
     expect(updated.position).toEqual({ x: 1, y: 2, z: 3 });
     expect(updated.rotation).toEqual({ x: 0, y: 0, z: 0 });
     expect(updated.scale).toEqual({ x: 2, y: 2, z: 2 });
+  });
+
+  it("duplicatePart: duplicates existing part with new ID", () => {
+    const part = createTestPart({ id: "part-1", name: "Wall A" });
+    const store = useAssemblyStore.getState();
+    store.addPart(part);
+    store.duplicatePart("part-1");
+
+    const state = useAssemblyStore.getState();
+    expect(state.parts).toHaveLength(2);
+    expect(state.parts[1].id).not.toBe("part-1");
+    expect(state.parts[1].name).toBe("Wall A (copy)");
+    expect(state.parts[1].type).toBe(part.type);
+    expect(state.parts[1].position).toEqual(part.position);
+    expect(state.parts[1].material).toEqual(part.material);
+  });
+
+  it("duplicatePart: no-op for nonexistent ID", () => {
+    const part = createTestPart({ id: "part-1" });
+    useAssemblyStore.getState().addPart(part);
+    useAssemblyStore.getState().duplicatePart("nonexistent");
+
+    expect(useAssemblyStore.getState().parts).toHaveLength(1);
+  });
+
+  it("clearParts: removes all parts and clears selection", () => {
+    const part1 = createTestPart({ id: "part-1" });
+    const part2 = createTestPart({ id: "part-2" });
+    const store = useAssemblyStore.getState();
+    store.addPart(part1);
+    store.addPart(part2);
+    store.selectPart("part-1");
+    store.clearParts();
+
+    const state = useAssemblyStore.getState();
+    expect(state.parts).toHaveLength(0);
+    expect(state.selectedPartId).toBeNull();
+  });
+
+  it("clearParts: no-op on empty store", () => {
+    useAssemblyStore.getState().clearParts();
+
+    const state = useAssemblyStore.getState();
+    expect(state.parts).toHaveLength(0);
+    expect(state.selectedPartId).toBeNull();
   });
 });
