@@ -18,11 +18,18 @@ import {
 
 export function Ground() {
   const activePartType = useAssemblyStore((s) => s.activePartType);
+  const selectedPartId = useAssemblyStore((s) => s.selectedPartId);
   const addPart = useAssemblyStore((s) => s.addPart);
+  const selectPart = useAssemblyStore((s) => s.selectPart);
 
   const handleClick = useCallback(
     (event: ThreeEvent<MouseEvent>) => {
-      if (!activePartType) return;
+      if (!activePartType) {
+        if (selectedPartId) {
+          selectPart(null);
+        }
+        return;
+      }
 
       event.stopPropagation();
 
@@ -43,7 +50,7 @@ export function Ground() {
 
       addPart(part);
     },
-    [activePartType, addPart],
+    [activePartType, selectedPartId, addPart, selectPart],
   );
 
   return (
