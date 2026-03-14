@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { ComponentPanel } from "@/components/ui/ComponentPanel";
 import { Toolbar } from "@/components/ui/Toolbar";
 
 const Canvas3D = dynamic(
@@ -11,8 +12,13 @@ const Canvas3D = dynamic(
 export default function Home() {
   return (
     <main className="relative h-dvh w-full">
-      <Toolbar />
-      <Canvas3D />
+      <ComponentPanel />
+      <div className="absolute top-4 left-60 z-10">
+        <Toolbar />
+      </div>
+      <div className="absolute inset-0 left-56">
+        <Canvas3D />
+      </div>
     </main>
   );
 }

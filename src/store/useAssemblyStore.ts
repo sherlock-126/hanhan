@@ -1,6 +1,11 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import type { AssemblyPart, Vector3Tuple, EulerTuple } from "@/types/assembly";
+import type {
+  AssemblyPart,
+  PartType,
+  Vector3Tuple,
+  EulerTuple,
+} from "@/types/assembly";
 
 interface TransformUpdate {
   position?: Vector3Tuple;
@@ -11,9 +16,11 @@ interface TransformUpdate {
 interface AssemblyState {
   parts: AssemblyPart[];
   selectedPartId: string | null;
+  activePartType: PartType | null;
   addPart: (part: AssemblyPart) => void;
   removePart: (id: string) => void;
   selectPart: (id: string | null) => void;
+  setActivePartType: (type: PartType | null) => void;
   updatePartTransform: (id: string, transform: TransformUpdate) => void;
   duplicatePart: (id: string) => void;
   clearParts: () => void;
@@ -24,6 +31,7 @@ export const useAssemblyStore = create<AssemblyState>()(
     (set) => ({
       parts: [],
       selectedPartId: null,
+      activePartType: null,
 
       addPart: (part) =>
         set(
@@ -48,9 +56,20 @@ export const useAssemblyStore = create<AssemblyState>()(
         set(
           () => ({
             selectedPartId: id,
+            activePartType: null,
           }),
           false,
           "selectPart",
+        ),
+
+      setActivePartType: (type) =>
+        set(
+          () => ({
+            activePartType: type,
+            selectedPartId: null,
+          }),
+          false,
+          "setActivePartType",
         ),
 
       updatePartTransform: (id, transform) =>
@@ -92,6 +111,7 @@ export const useAssemblyStore = create<AssemblyState>()(
           () => ({
             parts: [],
             selectedPartId: null,
+            activePartType: null,
           }),
           false,
           "clearParts",

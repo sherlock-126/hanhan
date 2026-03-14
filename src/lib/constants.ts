@@ -39,5 +39,5 @@ export const ORBIT_ENABLE_DAMPING = true;
 export const ORBIT_DAMPING_FACTOR = 0.05;
 
 // Parts
-export const SNAP_GRID_SIZE = 1;
+export const SNAP_GRID_SIZE = 0.5;
 export const DEFAULT_PART_Y = 0.5;

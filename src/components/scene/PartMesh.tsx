@@ -1,14 +1,16 @@
 "use client";
 
-import { memo, useMemo } from "react";
+import { memo, useMemo, useCallback } from "react";
 import { Edges } from "@react-three/drei";
 import { RigidBody } from "@react-three/rapier";
+import type { ThreeEvent } from "@react-three/fiber";
 import type { AssemblyPart, GeometryType } from "@/types/assembly";
 import { PART_TEMPLATES } from "@/lib/partTemplates";
 
 interface PartMeshProps {
   part: AssemblyPart;
   isSelected: boolean;
+  onSelect: (id: string) => void;
 }
 
 const GEOMETRY_TYPE_MAP: Record<string, GeometryType> = Object.fromEntries(
@@ -21,8 +23,13 @@ function clampScale(value: number): number {
   return Math.max(value, MIN_SCALE);
 }
 
-export const PartMesh = memo(function PartMesh({ part, isSelected }: PartMeshProps) {
+export const PartMesh = memo(function PartMesh({
+  part,
+  isSelected,
+  onSelect,
+}: PartMeshProps) {
   const geometryType = GEOMETRY_TYPE_MAP[part.type] ?? "box";
+  const isFixed = part.type === "floor";
 
   const scale: [number, number, number] = useMemo(
     () => [
@@ -33,14 +40,22 @@ export const PartMesh = memo(function PartMesh({ part, isSelected }: PartMeshPro
     [part.scale.x, part.scale.y, part.scale.z],
   );
 
+  const handleClick = useCallback(
+    (event: ThreeEvent<MouseEvent>) => {
+      event.stopPropagation();
+      onSelect(part.id);
+    },
+    [onSelect, part.id],
+  );
+
   return (
     <RigidBody
-      type="fixed"
+      type={isFixed ? "fixed" : "dynamic"}
       position={[part.position.x, part.position.y, part.position.z]}
       rotation={[part.rotation.x, part.rotation.y, part.rotation.z]}
       colliders={geometryType === "cylinder" ? "hull" : "cuboid"}
     >
-      <mesh scale={scale} castShadow receiveShadow>
+      <mesh scale={scale} castShadow receiveShadow onClick={handleClick}>
         {geometryType === "cylinder" ? (
           <cylinderGeometry args={[0.5, 0.5, 1, 16]} />
         ) : (

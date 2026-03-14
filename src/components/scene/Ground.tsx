@@ -1,10 +1,51 @@
 "use client";
 
+import { useCallback } from "react";
 import { Grid } from "@react-three/drei";
 import { RigidBody } from "@react-three/rapier";
-import { GRID_SIZE, GRID_DIVISIONS, GROUND_SIZE, GROUND_COLOR } from "@/lib/constants";
+import type { ThreeEvent } from "@react-three/fiber";
+import { useAssemblyStore } from "@/store/useAssemblyStore";
+import { createPartFromTemplate } from "@/lib/partFactory";
+import { getPartTemplate } from "@/lib/partTemplates";
+import { snapToGrid } from "@/lib/snapUtils";
+import {
+  GRID_SIZE,
+  GRID_DIVISIONS,
+  GROUND_SIZE,
+  GROUND_COLOR,
+  SNAP_GRID_SIZE,
+} from "@/lib/constants";
 
 export function Ground() {
+  const activePartType = useAssemblyStore((s) => s.activePartType);
+  const addPart = useAssemblyStore((s) => s.addPart);
+
+  const handleClick = useCallback(
+    (event: ThreeEvent<MouseEvent>) => {
+      if (!activePartType) return;
+
+      event.stopPropagation();
+
+      const point = event.point;
+      const template = getPartTemplate(activePartType);
+      const halfHeight = template.defaultScale.y / 2;
+
+      const snapped = snapToGrid(
+        { x: point.x, y: 0, z: point.z },
+        SNAP_GRID_SIZE,
+      );
+
+      const part = createPartFromTemplate(activePartType, {
+        x: snapped.x,
+        y: halfHeight,
+        z: snapped.z,
+      });
+
+      addPart(part);
+    },
+    [activePartType, addPart],
+  );
+
   return (
     <group>
       <Grid
@@ -19,9 +60,18 @@ export function Ground() {
         infiniteGrid
       />
       <RigidBody type="fixed" colliders="cuboid">
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
+        <mesh
+          rotation={[-Math.PI / 2, 0, 0]}
+          position={[0, -0.01, 0]}
+          receiveShadow
+          onClick={handleClick}
+        >
           <planeGeometry args={[GROUND_SIZE, GROUND_SIZE]} />
-          <meshStandardMaterial color={GROUND_COLOR} transparent opacity={0.5} />
+          <meshStandardMaterial
+            color={GROUND_COLOR}
+            transparent
+            opacity={0.5}
+          />
         </mesh>
       </RigidBody>
     </group>

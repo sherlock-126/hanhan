@@ -17,7 +17,14 @@ export interface MaterialConfig {
   opacity: number;
 }
 
-export type PartType = "wall" | "floor" | "column" | "beam" | "slab" | "stair";
+export type PartType =
+  | "box"
+  | "wall"
+  | "floor"
+  | "column"
+  | "beam"
+  | "slab"
+  | "stair";
 
 export type GeometryType = "box" | "cylinder";
 

@@ -51,4 +51,18 @@ describe("createPartFromTemplate", () => {
     const part = createPartFromTemplate("wall");
     expect(part.scale).toEqual({ x: 4, y: 3, z: 0.2 });
   });
+
+  it("creates a box part with correct defaults", () => {
+    const part = createPartFromTemplate("box");
+    expect(part.type).toBe("box");
+    expect(part.name).toBe("Box");
+    expect(part.scale).toEqual({ x: 1, y: 1, z: 1 });
+    expect(part.id).toBeTruthy();
+  });
+
+  it("creates a box part with custom position", () => {
+    const position = { x: 2, y: 0.5, z: 3 };
+    const part = createPartFromTemplate("box", position);
+    expect(part.position).toEqual(position);
+  });
 });

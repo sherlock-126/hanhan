@@ -18,13 +18,18 @@ function createTestPart(overrides: Partial<AssemblyPart> = {}): AssemblyPart {
 
 describe("useAssemblyStore", () => {
   beforeEach(() => {
-    useAssemblyStore.setState({ parts: [], selectedPartId: null });
+    useAssemblyStore.setState({
+      parts: [],
+      selectedPartId: null,
+      activePartType: null,
+    });
   });
 
   it("has correct initial state", () => {
     const state = useAssemblyStore.getState();
     expect(state.parts).toEqual([]);
     expect(state.selectedPartId).toBeNull();
+    expect(state.activePartType).toBeNull();
   });
 
   it("addPart: adds a part to empty store", () => {
@@ -179,5 +184,57 @@ describe("useAssemblyStore", () => {
     const state = useAssemblyStore.getState();
     expect(state.parts).toHaveLength(0);
     expect(state.selectedPartId).toBeNull();
+  });
+
+  it("setActivePartType: sets a valid type", () => {
+    useAssemblyStore.getState().setActivePartType("wall");
+    expect(useAssemblyStore.getState().activePartType).toBe("wall");
+  });
+
+  it("setActivePartType: toggles to null", () => {
+    useAssemblyStore.getState().setActivePartType("wall");
+    useAssemblyStore.getState().setActivePartType(null);
+    expect(useAssemblyStore.getState().activePartType).toBeNull();
+  });
+
+  it("setActivePartType: switches between types", () => {
+    useAssemblyStore.getState().setActivePartType("wall");
+    useAssemblyStore.getState().setActivePartType("floor");
+    expect(useAssemblyStore.getState().activePartType).toBe("floor");
+  });
+
+  it("setActivePartType: clears selectedPartId", () => {
+    const store = useAssemblyStore.getState();
+    store.addPart(createTestPart({ id: "part-1" }));
+    store.selectPart("part-1");
+    expect(useAssemblyStore.getState().selectedPartId).toBe("part-1");
+
+    useAssemblyStore.getState().setActivePartType("box");
+    expect(useAssemblyStore.getState().selectedPartId).toBeNull();
+    expect(useAssemblyStore.getState().activePartType).toBe("box");
+  });
+
+  it("selectPart: clears activePartType", () => {
+    useAssemblyStore.getState().setActivePartType("wall");
+    useAssemblyStore.getState().selectPart("part-1");
+    expect(useAssemblyStore.getState().activePartType).toBeNull();
+    expect(useAssemblyStore.getState().selectedPartId).toBe("part-1");
+  });
+
+  it("activePartType: preserved after addPart", () => {
+    useAssemblyStore.getState().setActivePartType("wall");
+    useAssemblyStore.getState().addPart(createTestPart({ id: "part-1" }));
+    expect(useAssemblyStore.getState().activePartType).toBe("wall");
+  });
+
+  it("clearParts: resets activePartType", () => {
+    const store = useAssemblyStore.getState();
+    store.setActivePartType("wall");
+    store.addPart(createTestPart({ id: "part-1" }));
+    store.clearParts();
+
+    const state = useAssemblyStore.getState();
+    expect(state.parts).toHaveLength(0);
+    expect(state.activePartType).toBeNull();
   });
 });

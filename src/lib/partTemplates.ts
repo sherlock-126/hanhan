@@ -1,6 +1,13 @@
 import type { PartType, PartTemplate } from "@/types/assembly";
 
 export const PART_TEMPLATES: Record<PartType, PartTemplate> = {
+  box: {
+    type: "box",
+    name: "Box",
+    geometryType: "box",
+    defaultScale: { x: 1, y: 1, z: 1 },
+    defaultMaterial: { color: "#7c8a99", roughness: 0.6, metalness: 0.2, opacity: 1 },
+  },
   wall: {
     type: "wall",
     name: "Wall",
