@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import { Edges } from "@react-three/drei";
+import { RigidBody } from "@react-three/rapier";
 import type { AssemblyPart, GeometryType } from "@/types/assembly";
 import { PART_TEMPLATES } from "@/lib/partTemplates";
 
@@ -20,7 +21,7 @@ function clampScale(value: number): number {
   return Math.max(value, MIN_SCALE);
 }
 
-export function PartMesh({ part, isSelected }: PartMeshProps) {
+export const PartMesh = memo(function PartMesh({ part, isSelected }: PartMeshProps) {
   const geometryType = GEOMETRY_TYPE_MAP[part.type] ?? "box";
 
   const scale: [number, number, number] = useMemo(
@@ -33,11 +34,13 @@ export function PartMesh({ part, isSelected }: PartMeshProps) {
   );
 
   return (
-    <group
+    <RigidBody
+      type="fixed"
       position={[part.position.x, part.position.y, part.position.z]}
       rotation={[part.rotation.x, part.rotation.y, part.rotation.z]}
+      colliders={geometryType === "cylinder" ? "hull" : "cuboid"}
     >
-      <mesh scale={scale}>
+      <mesh scale={scale} castShadow receiveShadow>
         {geometryType === "cylinder" ? (
           <cylinderGeometry args={[0.5, 0.5, 1, 16]} />
         ) : (
@@ -52,6 +55,6 @@ export function PartMesh({ part, isSelected }: PartMeshProps) {
         />
         {isSelected && <Edges color="#2563eb" lineWidth={2} threshold={15} />}
       </mesh>
-    </group>
+    </RigidBody>
   );
-}
+});
