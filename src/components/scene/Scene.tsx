@@ -2,6 +2,7 @@
 
 import { OrbitControls, Environment } from "@react-three/drei";
 import { Ground } from "./Ground";
+import { AssemblyScene } from "./AssemblyScene";
 
 export function Scene() {
   return (
@@ -11,6 +12,7 @@ export function Scene() {
       <Environment preset="city" />
       <OrbitControls makeDefault />
       <Ground />
+      <AssemblyScene />
     </>
   );
 }

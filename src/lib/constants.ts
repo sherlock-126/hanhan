@@ -12,3 +12,6 @@ export const PHYSICS_CONFIG = {
 };
 
 export const MAX_PIXEL_RATIO = 2;
+
+export const SNAP_GRID_SIZE = 1;
+export const DEFAULT_PART_Y = 0.5;

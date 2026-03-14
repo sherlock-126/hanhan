@@ -14,6 +14,8 @@ interface AssemblyState {
   removePart: (id: string) => void;
   selectPart: (id: string | null) => void;
   updatePartTransform: (id: string, transform: TransformUpdate) => void;
+  duplicatePart: (id: string) => void;
+  clearParts: () => void;
 }
 
 export const useAssemblyStore = create<AssemblyState>((set) => ({
@@ -48,5 +50,23 @@ export const useAssemblyStore = create<AssemblyState>((set) => ({
             }
           : p,
       ),
+    })),
+
+  duplicatePart: (id) =>
+    set((state) => {
+      const source = state.parts.find((p) => p.id === id);
+      if (!source) return state;
+      const duplicate: AssemblyPart = {
+        ...source,
+        id: crypto.randomUUID(),
+        name: `${source.name} (copy)`,
+      };
+      return { parts: [...state.parts, duplicate] };
+    }),
+
+  clearParts: () =>
+    set(() => ({
+      parts: [],
+      selectedPartId: null,
     })),
 }));
