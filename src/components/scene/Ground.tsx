@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { Grid } from "@react-three/drei";
 import { RigidBody } from "@react-three/rapier";
 import type { ThreeEvent } from "@react-three/fiber";
@@ -15,12 +15,17 @@ import {
   GROUND_COLOR,
   SNAP_GRID_SIZE,
 } from "@/lib/constants";
+import type { Vector3Tuple } from "@/types/assembly";
+import { GhostMesh, getGhostYPosition } from "./GhostMesh";
 
 export function Ground() {
   const activePartType = useAssemblyStore((s) => s.activePartType);
   const selectedPartId = useAssemblyStore((s) => s.selectedPartId);
   const addPart = useAssemblyStore((s) => s.addPart);
   const selectPart = useAssemblyStore((s) => s.selectPart);
+
+  const ghostPositionRef = useRef<Vector3Tuple>({ x: 0, y: 0, z: 0 });
+  const ghostVisibleRef = useRef<boolean>(false);
 
   const handleClick = useCallback(
     (event: ThreeEvent<MouseEvent>) => {
@@ -53,6 +58,25 @@ export function Ground() {
     [activePartType, selectedPartId, addPart, selectPart],
   );
 
+  const handlePointerMove = useCallback(
+    (event: ThreeEvent<PointerEvent>) => {
+      if (!activePartType) return;
+      const point = event.point;
+      const snapped = snapToGrid(
+        { x: point.x, y: 0, z: point.z },
+        SNAP_GRID_SIZE,
+      );
+      const halfHeight = getGhostYPosition(activePartType);
+      ghostPositionRef.current = { x: snapped.x, y: halfHeight, z: snapped.z };
+      ghostVisibleRef.current = true;
+    },
+    [activePartType],
+  );
+
+  const handlePointerOut = useCallback(() => {
+    ghostVisibleRef.current = false;
+  }, []);
+
   return (
     <group>
       <Grid
@@ -72,6 +96,8 @@ export function Ground() {
           position={[0, -0.01, 0]}
           receiveShadow
           onClick={handleClick}
+          onPointerMove={handlePointerMove}
+          onPointerOut={handlePointerOut}
         >
           <planeGeometry args={[GROUND_SIZE, GROUND_SIZE]} />
           <meshStandardMaterial
@@ -81,6 +107,13 @@ export function Ground() {
           />
         </mesh>
       </RigidBody>
+      {activePartType && (
+        <GhostMesh
+          activePartType={activePartType}
+          ghostPositionRef={ghostPositionRef}
+          ghostVisibleRef={ghostVisibleRef}
+        />
+      )}
     </group>
   );
 }

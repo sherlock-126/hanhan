@@ -41,3 +41,7 @@ export const ORBIT_DAMPING_FACTOR = 0.05;
 // Parts
 export const SNAP_GRID_SIZE = 0.5;
 export const DEFAULT_PART_Y = 0.5;
+
+// Ghost Mesh Preview
+export const GHOST_MESH_OPACITY = 0.4;
+export const GHOST_MESH_COLOR = "#60a5fa";
