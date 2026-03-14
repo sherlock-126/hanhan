@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { renderHook } from "@testing-library/react";
 import { useAssemblyStore } from "@/store/useAssemblyStore";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
