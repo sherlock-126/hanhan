@@ -12,3 +12,9 @@ export const PHYSICS_CONFIG = {
 };
 
 export const MAX_PIXEL_RATIO = 2;
+
+export const GRID_SNAP_SIZE = 0.5;
+export const SNAP_DISTANCE = 1.5;
+export const GHOST_MESH_OPACITY = 0.4;
+export const GHOST_MESH_COLOR = "#60a5fa";
+export const EXPLODE_OFFSET = 3.0;
