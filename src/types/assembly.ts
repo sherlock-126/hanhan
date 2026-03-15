@@ -17,6 +17,31 @@ export interface MaterialConfig {
   opacity: number;
 }
 
+export type PartType =
+  | "podium"
+  | "pillar"
+  | "dougong"
+  | "roof"
+  | "wall"
+  | "gate";
+
+export interface SnapPoint {
+  id: string;
+  position: Vector3Tuple;
+  direction: "up" | "down";
+  compatibleTypes: PartType[];
+}
+
+export interface PartTemplate {
+  type: PartType;
+  name: string;
+  category: string;
+  defaultScale: Vector3Tuple;
+  material: MaterialConfig;
+  snapPoints: SnapPoint[];
+  explodeOrder: number;
+}
+
 export interface AssemblyPart {
   id: string;
   name: string;
