@@ -5,10 +5,14 @@ import { ComponentPanel } from "@/components/ui/ComponentPanel";
 import { Toolbar } from "@/components/ui/Toolbar";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 
-const Canvas3D = dynamic(
-  () => import("@/components/scene/Canvas3D").then((mod) => ({ default: mod.Canvas3D })),
-  { ssr: false },
-);
+const Canvas3D = dynamic(() => import("@/components/scene/Canvas3D"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full items-center justify-center bg-gray-50">
+      <p className="text-sm text-gray-500">Loading 3D scene...</p>
+    </div>
+  ),
+});
 
 export default function Home() {
   useKeyboardShortcuts();

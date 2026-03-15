@@ -39,7 +39,7 @@ function WebGLErrorFallback() {
   );
 }
 
-export function Canvas3D() {
+export default function Canvas3D() {
   return (
     <WebGLErrorBoundary fallback={<WebGLErrorFallback />}>
       <Canvas
