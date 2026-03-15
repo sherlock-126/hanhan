@@ -15,7 +15,7 @@ function LoadingFallback() {
   );
 }
 
-export function Canvas3D() {
+export default function Canvas3D() {
   return (
     <Canvas
       camera={{
