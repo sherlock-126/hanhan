@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { Toolbar } from "@/components/ui/Toolbar";
 import { ComponentPanel } from "@/components/ui/ComponentPanel";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 
 const Canvas3D = dynamic(() => import("@/components/scene/Canvas3D"), {
   ssr: false,
@@ -14,6 +15,8 @@ const Canvas3D = dynamic(() => import("@/components/scene/Canvas3D"), {
 });
 
 export default function Home() {
+  useKeyboardShortcuts();
+
   return (
     <main className="relative h-dvh w-full">
       <Toolbar />

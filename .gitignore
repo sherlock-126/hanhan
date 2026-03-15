@@ -38,3 +38,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# VibeDev auto-generated (do not commit)
+CLAUDE.md
+.vibedev-status.json
